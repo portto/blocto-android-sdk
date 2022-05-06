@@ -32,4 +32,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              ignore: feature/firebase_app_distribution
