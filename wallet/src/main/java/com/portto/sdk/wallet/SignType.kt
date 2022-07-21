@@ -14,8 +14,4 @@ sealed interface SignType {
     enum class Flow(override val typeName: String) : SignType {
         USER_SIGNATURE("user_signature")
     }
-
-    companion object {
-        val allSignTypes: Set<SignType> = setOf(*Evm.values(), *Flow.values())
-    }
 }
