@@ -14,7 +14,7 @@ import com.portto.sdk.evm.bnb
 import com.portto.sdk.evm.ethereum
 import com.portto.sdk.evm.polygon
 import com.portto.sdk.wallet.BloctoSDKError
-import com.portto.sdk.wallet.evm.EvmSignType
+import com.portto.sdk.wallet.SignType
 import com.portto.valuedapp.R
 import com.portto.valuedapp.databinding.FragmentEvmSignMessageBinding
 import com.portto.valuedapp.hideKeyboard
@@ -40,45 +40,47 @@ import org.web3j.protocol.http.HttpService
 class EvmSignMessageFragment : Fragment(R.layout.fragment_evm_sign_message) {
 
     companion object {
-        private const val ERC1271_MAGIC_VALUE = "0x1626ba7e00000000000000000000000000000000000000000000000000000000"
+        private const val ERC1271_MAGIC_VALUE =
+            "0x1626ba7e00000000000000000000000000000000000000000000000000000000"
     }
 
     private lateinit var binding: FragmentEvmSignMessageBinding
     private val viewModel: EvmViewModel by activityViewModels()
 
-    private val rpcUrl get() = if (BloctoSDK.debug) {
-        viewModel.currentChain.testnetRpcUrl
-    } else {
-        viewModel.currentChain.mainnetRpcUrl
-    }
+    private val rpcUrl
+        get() = if (BloctoSDK.debug) {
+            viewModel.currentChain.testnetRpcUrl
+        } else {
+            viewModel.currentChain.mainnetRpcUrl
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEvmSignMessageBinding.bind(view)
 
-        var signType = EvmSignType.ETH_SIGN
+        var signType = SignType.Evm.ETH_SIGN
 
         binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
             val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
             when (checkedId) {
                 binding.ethSign.id -> {
-                    signType = EvmSignType.ETH_SIGN
+                    signType = SignType.Evm.ETH_SIGN
                     binding.input.setText("0x416e79206d65737361676520796f752077616e6e61207369676e")
                 }
                 binding.personalSign.id -> {
-                    signType = EvmSignType.PERSONAL_SIGN
+                    signType = SignType.Evm.PERSONAL_SIGN
                     binding.input.setText("Any message you wanna sign")
                 }
                 binding.typedDataV3.id -> {
-                    signType = EvmSignType.TYPED_DATA_SIGN_V3
+                    signType = SignType.Evm.TYPED_DATA_SIGN_V3
                     binding.input.setText(getString(R.string.default_typed_data_v3))
                 }
                 binding.typedDataV4.id -> {
-                    signType = EvmSignType.TYPED_DATA_SIGN_V4
+                    signType = SignType.Evm.TYPED_DATA_SIGN_V4
                     binding.input.setText(getString(R.string.default_typed_data_v4))
                 }
                 binding.typedData.id -> {
-                    signType = EvmSignType.TYPED_DATA_SIGN
+                    signType = SignType.Evm.TYPED_DATA_SIGN
                     binding.input.setText(getString(R.string.default_typed_data_v4))
                 }
             }
@@ -100,7 +102,7 @@ class EvmSignMessageFragment : Fragment(R.layout.fragment_evm_sign_message) {
         view?.clearFocus()
     }
 
-    private fun signMessage(signType: EvmSignType) {
+    private fun signMessage(signType: SignType.Evm) {
         resetView()
 
         val address = viewModel.currentAddress ?: kotlin.run {
@@ -131,11 +133,11 @@ class EvmSignMessageFragment : Fragment(R.layout.fragment_evm_sign_message) {
             lifecycleScope.launch(exceptionHandler) {
                 val isAuthorizedSigner = withContext(Dispatchers.IO) {
                     val messageByteArray = when (signType) {
-                        EvmSignType.ETH_SIGN -> message.removePrefix("0x").decodeHex()
-                        EvmSignType.PERSONAL_SIGN -> message.toByteArray()
-                        EvmSignType.TYPED_DATA_SIGN,
-                        EvmSignType.TYPED_DATA_SIGN_V3,
-                        EvmSignType.TYPED_DATA_SIGN_V4 -> EthSigUtil.eip712Hash(message)
+                        SignType.Evm.ETH_SIGN -> message.removePrefix("0x").decodeHex()
+                        SignType.Evm.PERSONAL_SIGN -> message.toByteArray()
+                        SignType.Evm.TYPED_DATA_SIGN,
+                        SignType.Evm.TYPED_DATA_SIGN_V3,
+                        SignType.Evm.TYPED_DATA_SIGN_V4 -> EthSigUtil.eip712Hash(message)
                     }
                     val hash = Keccak.digest(messageByteArray, KeccakParameter.KECCAK_256)
                     val signatureByteArray = signature.removePrefix("0x").decodeHex()

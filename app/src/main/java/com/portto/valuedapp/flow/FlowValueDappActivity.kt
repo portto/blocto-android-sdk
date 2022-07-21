@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.portto.sdk.core.BloctoSDK
 import com.portto.sdk.flow.flow
+import com.portto.sdk.wallet.SignType
 import com.portto.valuedapp.Config
 import com.portto.valuedapp.R
 import com.portto.valuedapp.databinding.ActivityFlowValueDappBinding
@@ -123,20 +124,20 @@ class FlowValueDappActivity : AppCompatActivity() {
             return
         }
 
-//        BloctoSDK.flow.signMessage(
-//            context = this,
-//            fromAddress = address,
-//            signType = SignTypeFlow.USER_SIGNATURE,
-//            message = msg,
-//            onSuccess = {
-//                signMsgBinding.signature.text = it
-//                signMsgBinding.signature.isVisible = true
-//            },
-//            onError = {
-//                signMsgBinding.signature.text = ""
-//                signMsgBinding.signature.isVisible = false
-//                viewModel.showError(it)
-//            })
+        BloctoSDK.flow.signMessage(
+            context = this,
+            fromAddress = address,
+            signType = SignType.Flow.USER_SIGNATURE,
+            message = msg,
+            onSuccess = {
+                signMsgBinding.signature.text = it
+                signMsgBinding.signature.isVisible = true
+            },
+            onError = {
+                signMsgBinding.signature.text = ""
+                signMsgBinding.signature.isVisible = false
+                viewModel.showError(it)
+            })
     }
 
     private fun showAccountProofDataDialog(signatures: String) {

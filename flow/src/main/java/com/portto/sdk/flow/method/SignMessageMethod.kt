@@ -1,15 +1,16 @@
-package com.portto.sdk.evm.method
+package com.portto.sdk.flow.method
 
 import android.net.Uri
 import com.portto.sdk.core.Blockchain
 import com.portto.sdk.core.method.Method
 import com.portto.sdk.wallet.BloctoSDKError
 import com.portto.sdk.wallet.Const
+import com.portto.sdk.wallet.METHOD_SIGN_MESSAGE
 import com.portto.sdk.wallet.SignType
 
 class SignMessageMethod(
     private val fromAddress: String,
-    private val signType: SignType.Evm,
+    private val signType: SignType.Flow,
     private val message: String,
     blockchain: Blockchain,
     onSuccess: (String) -> Unit,
@@ -17,7 +18,7 @@ class SignMessageMethod(
 ) : Method<String>(blockchain, onSuccess, onError) {
 
     override val name: String
-        get() = "sign_message"
+        get() = METHOD_SIGN_MESSAGE
 
     override fun handleCallback(uri: Uri) {
         val signature = uri.getQueryParameter(Const.KEY_SIGNATURE)
